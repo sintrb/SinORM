@@ -236,3 +236,7 @@ if __name__ == '__main__':
     db_commit()
     
     
+    # get the count
+    print get_objects(table, columns='count(*) as count')[0]['count']
+    
+    
