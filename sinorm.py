@@ -62,6 +62,11 @@ def __checkdb__():
     if not cur:
         cur = db.cursor()
 
+def set_db(sdb):
+    global db, cur
+    db = sdb
+    cur = db.cursor()
+
 def db_commit():
     '''Commit the database'''
     db.commit()
