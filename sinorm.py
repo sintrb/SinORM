@@ -55,14 +55,15 @@ def __createconditions__(conditions, condtype):
     return conditions
 
 def __checkdb__():
-    global db, cur
     '''This method use to check the db variable is valid'''
+    global db, cur
     if not db:
         raise Error('The database connection is None. Please open a connection from SinORM before you user the modle')
     if not cur:
         cur = db.cursor()
 
 def set_db(sdb):
+    '''Set the database'''
     global db, cur
     db = sdb
     cur = db.cursor()
