@@ -74,19 +74,19 @@ def __checkdb__():
 def set_db(sdb):
     '''Set the database'''
     global db, cur, __dbtype__
-    dbtype = str(type(db)).lower()
+    dbtype = str(type(sdb)).lower()
     if dbtype.find('sqlite')>=0:
         # sqlite
         if mode_debug:
             print 'sqlite'
         __dbtype__ = __TYPE_SQLITE__
-        pass
     elif dbtype.find('mysql')>=0:
         # MySQL
         if mode_debug:
             print 'MySQL'
         __dbtype__ = __TYPE_MYSQL__
-        pass
+    else:
+        raise Error('Unknown database type:%s'%dbtype)
     db = sdb
     cur = db.cursor()
 
