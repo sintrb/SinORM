@@ -224,7 +224,7 @@ def __test__():
     # create the table
     create_table(table,
                {
-                'name':'char(128) not null', # the type of field 'name' is char(32) not null
+                'name':'char(128) not null', # the type of field 'name' is char(128) not null
                 'age':1, # the type of field 'age' is integer, and can not be null, because the value is not 0 
                 'height':0.0, # the type of field 'height' is float, and can be null, because the value is 0
                 'info':''   # the type of field 'info' is text, and can be null, because the value is a empty string
@@ -274,20 +274,26 @@ if __name__ == '__main__':
     autocommit = False
     
     # Test MySQL
-    import MySQLdb
-    db = MySQLdb.connect(host='127.0.0.1', user='trb', passwd='123', db='dbp', port=3306)
-    set_db(db)
     print '---Start Test MySQL---'
-    __test__()
+    try:
+        import MySQLdb
+        db = MySQLdb.connect(host='127.0.0.1', user='trb', passwd='123', db='dbp', port=3306)
+        set_db(db)
+        __test__()
+    except:
+        print '****Test MySQL Fail****'
     print '---End Test MySQL---'
     
     
     # Test sqlite
-    import sqlite3
-    db = sqlite3.connect('sqlite.db')
-    set_db(db)
     print '---Start Test sqlite---'
-    __test__()
+    try:
+        import sqlite3
+        db = sqlite3.connect('sqlite.db')
+        set_db(db)
+        __test__()
+    except:
+        print '****Test sqlite Fail****'
     print '---End Test sqlite---'
     
     
