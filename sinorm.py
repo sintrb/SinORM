@@ -5,7 +5,9 @@ Created on 2013-4-15
 
 This is Object Relation Mapping(ORM) Library
 
-v1.0 2012-04-15
+v1.1 2013-04-17
+
+v1.0 2013-04-15
 '''
 
 import types
@@ -14,6 +16,10 @@ db = None   # database
 cur = None  # cursor
 mode_debug = False  # debug switch, every SQL will display if the value is True, otherwise nothing to display 
 autocommit = True   # commit switch, if the value is True, the database will be commit after every modify operation 
+
+__TYPE_SQLITE__ = 0
+__TYPE_MYSQL__ = 1
+__dbtype__ = 0
 
 class Error(Exception):
     '''ORM Base Error'''
@@ -39,11 +45,14 @@ def __typemap__(v):
     elif type(v) is types.IntType:
         return __ifornot__(v, 'int not null', 'int')
     elif type(v) is types.LongType:
-        return __ifornot__(v, 'float not null', 'fload')
+        return __ifornot__(v, 'bigint not null', 'bigint')
 
 def __literal__(v):
     '''Database literal'''
-    return db.literal(v)
+    if __dbtype__ == __TYPE_SQLITE__:
+        return "'%s'"%v
+    elif __dbtype__ == __TYPE_MYSQL__:
+        return db.literal(v)
 
 def __createconditions__(conditions, condtype):
     '''Create conditions by conditions and condition-type'''
@@ -64,7 +73,20 @@ def __checkdb__():
 
 def set_db(sdb):
     '''Set the database'''
-    global db, cur
+    global db, cur, __dbtype__
+    dbtype = str(type(db)).lower()
+    if dbtype.find('sqlite')>=0:
+        # sqlite
+        if mode_debug:
+            print 'sqlite'
+        __dbtype__ = __TYPE_SQLITE__
+        pass
+    elif dbtype.find('mysql')>=0:
+        # MySQL
+        if mode_debug:
+            print 'MySQL'
+        __dbtype__ = __TYPE_MYSQL__
+        pass
     db = sdb
     cur = db.cursor()
 
@@ -174,7 +196,10 @@ def create_table(table, tplobj, keyidname='id', new=False):
         sql = 'drop table if exists `%s`' % table
         exe_sql(sql)
     if not tplobj.has_key(keyidname):
-        tplobj[keyidname] = 'int not null auto_increment'
+        if __dbtype__ == __TYPE_SQLITE__:
+            tplobj[keyidname] = 'integer not null'  # SQLite
+        elif __dbtype__ == __TYPE_MYSQL__:
+            tplobj[keyidname] = 'int not null auto_increment' # MySQL
     struct = ','.join(['`%s` %s' % (k, __typemap__(v)) for (k, v) in tplobj.items()])
     struct = '%s,%s' % (struct, 'primary key (`%s`)' % keyidname)
     sql = 'create table if not exists `%s`(%s)' % (table, struct)
@@ -190,13 +215,12 @@ def drop_table(table):
     sql = 'drop table `%s`' % table
     return exe_sql(sql, autocommit)
 
-if __name__ == '__main__':
-    import MySQLdb
-    db = MySQLdb.connect(host='127.0.0.1', user='trb', passwd='123', db='dbp', port=3306)
-    mode_debug = True
-    autocommit = False
-    
+
+
+def __test__():
+    # table name
     table = 't_students'
+    
     # create the table
     create_table(table,
                {
@@ -244,5 +268,30 @@ if __name__ == '__main__':
     
     # get the count
     print get_objects(table, columns='count(*) as count')[0]['count']
+
+if __name__ == '__main__':
+    mode_debug = True
+    autocommit = False
+    
+    # Test MySQL
+    import MySQLdb
+    db = MySQLdb.connect(host='127.0.0.1', user='trb', passwd='123', db='dbp', port=3306)
+    set_db(db)
+    print '---Start Test MySQL---'
+    __test__()
+    print '---End Test MySQL---'
+    
+    
+    # Test sqlite
+    import sqlite3
+    db = sqlite3.connect('sqlite.db')
+    set_db(db)
+    print '---Start Test sqlite---'
+    __test__()
+    print '---End Test sqlite---'
+    
+    
+
+    
     
     
