@@ -3,6 +3,8 @@ SinORM
 
 A Simple Python Object Relation Mapping.
 
+v1.2
+Add Postgre Database supporting, base on pgdb.
 
 v1.1
 Add sqlite supporting.
