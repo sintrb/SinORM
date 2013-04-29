@@ -320,7 +320,7 @@ def __test__():
 
 def __testall__():
     global mode_debug, autocommit
-    mode_debug = False
+    mode_debug = True
     autocommit = False
     # Test MySQL
     print '\n---Start Test MySQL---'
